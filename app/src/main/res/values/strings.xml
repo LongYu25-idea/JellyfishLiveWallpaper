@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jellyfish Ocean</string>
+    <string name="wallpaper_description">藍紫色深海中，半透明發光的水母緩緩漂浮。</string>
+    <string name="subtitle">寫實發光水母動態桌布</string>
+    <string name="label_count">水母數量：%1$d</string>
+    <string name="label_speed">移動速度：%1$d%%</string>
+    <string name="label_brightness">亮度：%1$d%%</string>
+    <string name="label_power_save">省電模式（30 FPS、最多 6 隻水母）</string>
+    <string name="btn_set_wallpaper">設為動態桌布</string>
+    <string name="hint">調整後的設定會立即套用到正在運作的桌布。點擊主畫面空白處可以驚動水母，傾斜手機會讓水母順勢漂移。</string>
+</resources>
