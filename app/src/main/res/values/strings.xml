@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Jellyfish Ocean</string>
-    <string name="wallpaper_description">藍紫色深海中，半透明發光的水母緩緩漂浮。</string>
-    <string name="subtitle">寫實發光水母動態桌布</string>
+    <string name="subtitle">浮在畫面上的半透明發光水母</string>
     <string name="label_count">水母數量：%1$d</string>
     <string name="label_speed">移動速度：%1$d%%</string>
-    <string name="label_brightness">亮度：%1$d%%</string>
-    <string name="label_power_save">省電模式（30 FPS、最多 6 隻水母）</string>
-    <string name="btn_set_wallpaper">設為動態桌布</string>
-    <string name="hint">調整後的設定會立即套用到正在運作的桌布。點擊主畫面空白處可以驚動水母，傾斜手機會讓水母順勢漂移。</string>
+    <string name="label_opacity">透明度（越大越明顯）：%1$d%%</string>
+    <string name="label_power_save">省電模式（30 FPS、最多 4 隻水母）</string>
+    <string name="btn_start">啟動水母</string>
+    <string name="btn_stop">停止水母</string>
+    <string name="hint">水母會浮在所有 App 上方，不會擋住你的點擊與操作。傾斜手機水母會順勢漂移。設定調整後會立即套用。</string>
+    <string name="need_overlay_permission">請在接下來的畫面中，允許 Jellyfish Ocean「顯示在其他應用程式上層」，然後回來再按一次啟動。</string>
+    <string name="notif_channel">水母懸浮顯示</string>
+    <string name="notif_title">水母正在海裡游</string>
+    <string name="notif_text">點一下開啟設定</string>
+    <string name="notif_stop">停止</string>
 </resources>

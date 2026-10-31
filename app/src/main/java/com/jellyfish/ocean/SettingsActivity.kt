@@ -1,12 +1,14 @@
 package com.jellyfish.ocean
 
+import android.Manifest
 import android.app.Activity
-import android.app.WallpaperManager
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
@@ -15,9 +17,12 @@ import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 
-/** 同時是桌布的設定頁，也是 App 的啟動頁 */
+/** App 的啟動頁：調整設定、啟動 / 停止水母懸浮層 */
 class SettingsActivity : Activity() {
+
+    private lateinit var toggle: Button
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
@@ -44,8 +49,8 @@ class SettingsActivity : Activity() {
             Prefs.MIN_SPEED, Prefs.MAX_SPEED, Prefs.DEF_SPEED
         )
         addSlider(
-            column, R.string.label_brightness, Prefs.KEY_BRIGHTNESS,
-            Prefs.MIN_BRIGHTNESS, Prefs.MAX_BRIGHTNESS, Prefs.DEF_BRIGHTNESS
+            column, R.string.label_opacity, Prefs.KEY_OPACITY,
+            Prefs.MIN_OPACITY, Prefs.MAX_OPACITY, Prefs.DEF_OPACITY
         )
 
         column.addView(Switch(this).apply {
@@ -59,10 +64,8 @@ class SettingsActivity : Activity() {
             }
         })
 
-        column.addView(Button(this).apply {
-            text = getString(R.string.btn_set_wallpaper)
-            setOnClickListener { openWallpaperPicker() }
-        }, LinearLayout.LayoutParams(
+        toggle = Button(this).apply { setOnClickListener { onToggle() } }
+        column.addView(toggle, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         ).apply { topMargin = dp(20) })
 
@@ -75,6 +78,41 @@ class SettingsActivity : Activity() {
             isFillViewport = true
             addView(column)
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshButton()
+    }
+
+    private fun refreshButton() {
+        toggle.text = getString(if (OverlayService.running) R.string.btn_stop else R.string.btn_start)
+    }
+
+    private fun onToggle() {
+        if (OverlayService.running) {
+            startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_STOP))
+            toggle.postDelayed({ refreshButton() }, 400)
+            return
+        }
+
+        if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, R.string.need_overlay_permission, Toast.LENGTH_LONG).show()
+            startActivity(
+                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            )
+            return
+        }
+
+        // Android 13+ 通知權限：沒給也能運作，只是看不到通知列上的停止按鈕
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
+
+        startForegroundService(Intent(this, OverlayService::class.java))
+        toggle.postDelayed({ refreshButton() }, 600)
     }
 
     private fun text(value: String, sizeSp: Float, color: Int) = TextView(this).apply {
@@ -108,17 +146,5 @@ class SettingsActivity : Activity() {
         }
         parent.addView(label)
         parent.addView(bar)
-    }
-
-    private fun openWallpaperPicker() {
-        val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(
-            WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-            ComponentName(this, JellyfishWallpaperService::class.java)
-        )
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            startActivity(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
-        }
     }
 }
